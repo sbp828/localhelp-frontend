@@ -42,6 +42,65 @@ src/
 
 ## ⚙️ Setup Instructions
 
+
+### 5️⃣ Setup Web Server (Frontend)
+
+```bash
+sudo apt update
+sudo apt install nginx -y
+```
+### Start and enable nginx and check status:
+
+```bash
+sudo systemctl start nginx
+sudo systemctl enable nginx
+sudo systemctl status nginx
+```
+
+### 📁 Clean default web folder
+
+Nginx serves from: /var/www/html
+
+Clear it:
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+### Pull Code from GitHub to EC2
+
+```bash
+git clone https://github.com/your-username/3tier-devsecops-ai.git
+cd localhelp-frontend
+```
+
+### Build the React App
+```bash
+npm install
+npm run build
+```
+### 👉 This creates: build/
+
+### 📦 Deploy React to Nginx
+
+Copy build files:
+
+```bash
+sudo cp -r build/* /var/www/html/
+```
+
+### 6️⃣ Test the Application
+
+NGINX is serving your files ✅
+
+Your React app is deployed ✅
+
+* Open browser: http://your-ec2-ip
+
+```
+👉 Your React app is LIVE 🎉
+```
+
 ### 1. Clone the repo
 
 ```
