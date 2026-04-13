@@ -72,7 +72,7 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://backend.localhelp.store:8080/;
+        proxy_pass http://backend.localhelp.store:8080;
     }
 }
 EOF
