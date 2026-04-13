@@ -45,7 +45,19 @@ VALIDATE $? "Starting nginx"
 systemctl enable nginx
 VALIDATE $? "Enabling nginx"
 
+echo "================ INSTALLING NODEJS ================"
+
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+VALIDATE $? "Adding NodeSource repo"
+
+apt install -y nodejs
+VALIDATE $? "Installing Node.js"
+
+node -v
+npm -v
+
 echo "================ BUILDING REACT APP ================"
+
 cd $REPO || exit 1
 
 npm install
@@ -90,7 +102,7 @@ ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
 
 rm -f /etc/nginx/sites-enabled/default
 
-VALIDATE $? "Cleaning default site"
+VALIDATE $? "Removing default site"
 
 echo "================ TESTING NGINX ================"
 nginx -t
@@ -99,7 +111,7 @@ VALIDATE $? "Nginx syntax check"
 systemctl restart nginx
 VALIDATE $? "Restarting nginx"
 
-echo "================ DONE ================"
+echo "================ DEPLOYMENT DONE ================"
 
 echo "🎉 Frontend deployed successfully!"
 echo "👉 Open: http://<your-ec2-public-ip>"
