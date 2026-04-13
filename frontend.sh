@@ -59,7 +59,23 @@ VALIDATE $? "Copying frontend files"
 echo "Creating Nginx reverse proxy config..." 
 
 #check your repo and path
-cp $REPO/localhelp.conf /etc/nginx/sites-available/localhelp 
+cat > /etc/nginx/sites-available/localhelp <<EOF
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files \$uri /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://backend.localhelp.store:8080/;
+    }
+}
+EOF
 VALIDATE $? "Copied localhelp conf"
 
 ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
