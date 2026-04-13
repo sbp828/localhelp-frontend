@@ -52,8 +52,7 @@ VALIDATE $? "Cleaning default web folder of nginx"
 mkdir -p /app
 cd /app
 
-# Move to /app
-cd /app
+
 
 # Clone or pull repo safely
 if [ ! -d "localhelp-frontend" ]; then
@@ -87,6 +86,9 @@ VALIDATE $? "Copied localhelp conf"
 ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
 VALIDATE $? "Enabled localhelp site"
 
+echo "Removing default nginx site..."
+rm -f /etc/nginx/sites-enabled/default
+
 
 nginx -t
 VALIDATE $? "Nginx syntax check"
@@ -94,9 +96,7 @@ VALIDATE $? "Nginx syntax check"
 systemctl reload nginx
 VALIDATE $? "Reloading nginx"
 
-# Restart nginx
-systemctl restart nginx 
-VALIDATE $? "Restarting Nginx..."
+
 
 if [ $? -eq 0 ];then
     echo "🎉 Frontend setup completed successfully!"
