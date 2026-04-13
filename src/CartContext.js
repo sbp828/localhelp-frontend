@@ -47,7 +47,7 @@ export function CartProvider({ children }) {
     if (cartItems.length === 0) return;
 
     try {
-      const response = await fetch("http://localhost:8080/orders", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
