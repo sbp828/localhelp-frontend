@@ -81,8 +81,18 @@ fi
 echo "Creating Nginx reverse proxy config..." 
 
 #check your repo and path
-cp /app/localhelp-frontend/localhelp.conf /etc/nginx/default.d/
+cp /app/localhelp-frontend/localhelp.conf /etc/nginx/sites-available/localhelp
 VALIDATE $? "Copied localhelp conf"
+
+ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
+VALIDATE $? "Enabled localhelp site"
+
+
+nginx -t
+VALIDATE $? "Nginx syntax check"
+
+systemctl reload nginx
+VALIDATE $? "Reloading nginx"
 
 # Restart nginx
 systemctl restart nginx 
