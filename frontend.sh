@@ -4,25 +4,27 @@ USERID=$(id -u)
 TIMESTAMP=$(date +%F-%H-%M-%S)
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
 LOGFILE=/tmp/$SCRIPT_NAME-$TIMESTAMP.log
+
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-REPO="/home/ubuntu/localhelp-frontend/"
+
+REPO="/home/ubuntu/localhelp-frontend"
+
 echo "logfile location = $LOGFILE"
-#exec &>>$LOGFILE
 
 if [ $USERID -ne 0 ]
 then
     echo "Please run this script with root access."
-    exit 1 # manually exit if error comes.
+    exit 1
 else
     echo "You are super user."
 fi
 
 VALIDATE(){
     if [ $1 -ne 0 ]
-   then
+    then
         echo -e "$2...$R FAILURE $N"
         exit 1
     else
@@ -30,41 +32,44 @@ VALIDATE(){
     fi
 }
 
-# Install packages
-apt update
+echo "================ UPDATING SYSTEM ================"
+apt update -y
 
-#Setup Web Server (Frontend)
+echo "================ INSTALLING NGINX ================"
 apt install nginx -y
 VALIDATE $? "Installing nginx"
 
-#Start and enable nginx and check status:
 systemctl start nginx
 VALIDATE $? "Starting nginx"
 
 systemctl enable nginx
 VALIDATE $? "Enabling nginx"
 
-systemctl status nginx
+echo "================ BUILDING REACT APP ================"
+cd $REPO || exit 1
 
-#📁 Clean default web folder
-rm -rf /usr/share/nginx/html/*
-VALIDATE $? "Cleaning default web folder of nginx"
+npm install
+VALIDATE $? "npm install"
 
-echo "Deploying frontend build/source..."
-cp -r $REPO/* /usr/share/nginx/html/
-VALIDATE $? "Copying frontend files"
+npm run build
+VALIDATE $? "React build"
 
+echo "================ DEPLOYING BUILD ================"
 
+rm -rf /var/www/localhelp
+mkdir -p /var/www/localhelp
 
-echo "Creating Nginx reverse proxy config..." 
+cp -r build/* /var/www/localhelp/
+VALIDATE $? "Copying build files"
 
-#check your repo and path
+echo "================ CONFIGURING NGINX ================"
+
 cat > /etc/nginx/sites-available/localhelp <<EOF
 server {
     listen 80;
     server_name _;
 
-    root /usr/share/nginx/html;
+    root /var/www/localhelp;
     index index.html;
 
     location / {
@@ -73,32 +78,28 @@ server {
 
     location /api/ {
         proxy_pass http://backend.localhelp.store:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
     }
 }
 EOF
-VALIDATE $? "Copied localhelp conf"
+
+VALIDATE $? "Creating nginx config"
 
 ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
-VALIDATE $? "Enabled localhelp site"
 
-echo "Removing default nginx site..."
 rm -f /etc/nginx/sites-enabled/default
 
+VALIDATE $? "Cleaning default site"
 
+echo "================ TESTING NGINX ================"
 nginx -t
 VALIDATE $? "Nginx syntax check"
 
-systemctl reload nginx
-VALIDATE $? "Reloading nginx"
+systemctl restart nginx
+VALIDATE $? "Restarting nginx"
 
+echo "================ DONE ================"
 
-
-if [ $? -eq 0 ];then
-    echo "🎉 Frontend setup completed successfully!"
-    echo "Access your app via browser using server IP"
-else
-    echo "something went wrong..check logs"
-    exit 1
-fi
-
-
+echo "🎉 Frontend deployed successfully!"
+echo "👉 Open: http://<your-ec2-public-ip>"
