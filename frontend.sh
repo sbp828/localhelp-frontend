@@ -8,6 +8,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+REPO="/home/ubuntu/localhelp-frontend/localhelp-frontend"
 echo "logfile location = $LOGFILE"
 #exec &>>$LOGFILE
 
@@ -49,38 +50,16 @@ systemctl status nginx
 rm -rf /usr/share/nginx/html/*
 VALIDATE $? "Cleaning default web folder of nginx"
 
-mkdir -p /app
-cd /app
+echo "Deploying frontend build/source..."
+cp -r $REPO/* /usr/share/nginx/html/
+VALIDATE $? "Copying frontend files"
 
-
-
-# Clone or pull repo safely
-if [ ! -d "localhelp-frontend" ]; then
-    echo "Cloning frontend repo..."
-    git clone https://github.com/sbp828/localhelp-frontend.git &>>$LOGFILE
-    VALIDATE $? "Cloning frontend code"
-else
-    echo "Repo exists, updating..."
-    cd localhelp-frontend
-    git pull &>>$LOGFILE
-    VALIDATE $? "Pulling latest code"
-    cd ..
-fi
-
-# Copy content to nginx html
-if [ -d "/app/localhelp-frontend" ]; then
-    cp -r /app/localhelp-frontend/* /usr/share/nginx/html/
-    VALIDATE $? "Copying frontend files"
-else
-    echo "Frontend repo not found, cannot copy files"
-    exit 1
-fi
 
 
 echo "Creating Nginx reverse proxy config..." 
 
 #check your repo and path
-cp /app/localhelp-frontend/localhelp.conf /etc/nginx/sites-available/localhelp
+cp $REPO/localhelp.conf /etc/nginx/sites-available/localhelp 
 VALIDATE $? "Copied localhelp conf"
 
 ln -sf /etc/nginx/sites-available/localhelp /etc/nginx/sites-enabled/localhelp
