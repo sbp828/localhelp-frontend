@@ -49,6 +49,9 @@ systemctl status nginx
 rm -rf /usr/share/nginx/html/*
 VALIDATE $? "Cleaning default web folder of nginx"
 
+mkdir -p /app
+cd /app
+
 # Move to /app
 cd /app
 
