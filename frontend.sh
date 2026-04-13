@@ -78,7 +78,7 @@ fi
 echo "Creating Nginx reverse proxy config..." 
 
 #check your repo and path
-cp /home/ubuntu/local-frontend/localhelp.conf /etc/nginx/default.d/localhelp.conf &>>$LOGFILE
+cp /app/localhelp-frontend/localhelp.conf /etc/nginx/default.d/
 VALIDATE $? "Copied localhelp conf"
 
 # Restart nginx
