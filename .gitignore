@@ -1,0 +1,53 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Build output (IMPORTANT)
+# =========================
+dist/
+build/
+out/
+.next/
+.nuxt/
+coverage/
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Nginx / deployment artifacts
+# (IMPORTANT for your setup)
+# =========================
+*.conf
+nginx.conf
+localhelp.conf
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
